@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- RevitElementHierarchy
+     https://inpad.ru
+     © Inpad, 2022
+	 
+	 The manifest file. -->
+<RevitAddIns>
+  <AddIn Type="Application">
+  	<AddInId>cac89f2d-4a1e-47c5-bd91-8cd81eba0453</AddInId>
+    <Name>RevitElementsHierarchy</Name>
+    <Assembly>RevitElementsHierarchy/RevitElementsHierarchy.dll</Assembly>
+    <FullClassName>InpadPlugins.RevitElementHierarchy.ExternalApplication</FullClassName>
+    <VendorId>ru.blogspot.revit-addins</VendorId>
+    <VendorDescription>Inpad, https://inpad.ru</VendorDescription>
+  </AddIn>
+</RevitAddIns>
