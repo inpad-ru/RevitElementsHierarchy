@@ -22,8 +22,9 @@
         <GridSplitter Grid.Column="1" Grid.RowSpan="2" ShowsPreview="False" Width="3" 
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-        <ListBox x:Name="instList"
-                 ItemsSource="{Binding SelectedInstance.Parameters}" Grid.Column="2">
+        <ListBox x:Name="instList" Grid.Column="2"
+                 ItemsSource="{Binding SelectedInstance.Parameters}" 
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -31,13 +32,13 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid ShowGridLines="True">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Path=Name}" HorizontalAlignment="Center" />
-                        <TextBox Grid.Column="1" TextChanged="TextBox_TextChanged" Text="{Binding Path=Value}" Margin="5 0 0 0" />
+                        <TextBlock Grid.Column="0" Text="{Binding Path=Name}" HorizontalAlignment="Left" TextWrapping="Wrap" />
+                        <TextBox Grid.Column="1" TextChanged="TextBox_TextChanged" Text="{Binding Path=Value}" TextWrapping="Wrap" Margin="5 0 0 0" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
