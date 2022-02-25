@@ -1,6 +1,6 @@
-﻿using System;
+﻿using InpadPlugins.RevitElementsHierarchy.Models;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -24,89 +24,22 @@ namespace InpadPlugins.RevitElementsHierarchy.Views
 
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private Inst selectedInstance;
-        public ObservableCollection<Parameter> Param { get; set; }
-        public ObservableCollection<Inst> Insts { get; set; }
-        public Inst SelectedInstance
-        {
-            get { return selectedInstance; }
-            set
-            {
-                selectedInstance = value;
-                OnPropertyChanged();
-            }
-        }
-
+        private ViewModels.ViewModel viewModel { get; }
         public MainWindow()
         {
             InitializeComponent();
-            Insts = new ObservableCollection<Inst>
-            {
-                new Inst
-                {
-                    Name ="Category 1",
-                    InstItem = new ObservableCollection<Inst>
-                    {
-                        new Inst {Name ="Type 1"},
-                        new Inst {Name="Type 2" },
-                        new Inst
-                        {
-                            Name ="Type 3",
-                            InstItem = new ObservableCollection<Inst>
-                            {
-                                new Inst {Name="Inst 1" },
-                                new Inst {Name="Inst 2" },
-                                new Inst {Name="Inst 3" },
-                                new Inst {Name="Inst 4" },
-                            }
-                        }
-                    }
-                },
-                new Inst
-                {
-                    Name="Category 2",
-                    InstItem = new ObservableCollection<Inst>
-                    {
-                        new Inst
-                        {
-                            Name ="Type 1",
-                            InstItem = new ObservableCollection<Inst>
-                            {
-                                new Inst {Name="Inst 1" },
-                                new Inst {Name="Inst 2" }
-                            }
-                        },
-                        new Inst {Name="Type 2" },
-                        new Inst
-                        {
-                            Name ="Type 3",
-                           InstItem = new ObservableCollection<Inst>
-                            {
-                                new Inst {Name="Instance 1",
-                                Parameters = new ObservableCollection<Parameter>
-                                {
-                                    new Parameter {Name="Param1"},
-                                    new Parameter {Name="Param2"},
-                                    new Parameter {Name="Param3"}
-                                }
-                                },
-                                new Inst {Name="Instance 2" },
-                                new Inst {Name="Instance 3" }
-                            }
-                        }
-                    }
-                },
-                new Inst {Name="Category 3"}
-            };
-            DataContext = this;
+            
+            DataContext = new ViewModels.ViewModel();
+
+            viewModel = DataContext as ViewModels.ViewModel;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void instList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Inst p = (Inst)instList.SelectedItem;
-            MessageBox.Show(p.Name);
+            //Inst p = (Inst)instList.SelectedItem;
+            //MessageBox.Show(p.Name);
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -114,33 +47,14 @@ namespace InpadPlugins.RevitElementsHierarchy.Views
             TextBox textBox = (TextBox)sender;
         }
 
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
-        }
-
         private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            SelectedInstance = (Inst)treeCat.SelectedItem;
+            viewModel.SelectedInstance = (Inst)treeCat.SelectedItem;
         }
 
         private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            SelectedInstance = (Inst)e.NewValue;
+            viewModel.SelectedInstance = (Inst)e.NewValue;
         }
-    }
-
-    public class Inst
-    {
-        public string Name { get; set; }
-        public ObservableCollection<Inst> InstItem { get; set; }
-        public ObservableCollection<Parameter> Parameters { get; set; }
-    }
-
-    public class Parameter
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
     }
 }
