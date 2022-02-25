@@ -49,7 +49,7 @@ namespace InpadPlugins.RevitElementsHierarchy
                 Inst UnknownCat = new Inst { Name = "Unknown" };
                 Inst currentCategory;
                 Inst currentType;
-                bool isUnknownCat;
+                bool isUnknownCat=false;
 
                 foreach (var cat in t2)
                 {
@@ -60,26 +60,53 @@ namespace InpadPlugins.RevitElementsHierarchy
                     catch (NullReferenceException ex)
                     {
                         isUnknownCat = true;
-                        currentCategory = new Inst { Name = "Unknown" };
+                        currentCategory = new Inst();
                     }
                     foreach (var type in cat)
                     {
                         currentType = new Inst { Name = doc.GetElement(type.Key).Name };
                         foreach (var inst in type)
                         {
-                            Elem.Add(new Inst { Name = inst.Name, Parameters = GetParameters1(inst) });
+                            Elem.Add(new Inst { Name = inst.Name, Element = inst, Parameters = GetParameters1(inst) });
                         }
                         currentType.InstItem = Elem;
                         Elem = new ObservableCollection<Inst>();
                         Types.Add(currentType);
                     }
-                    currentCategory.InstItem = Types;
+                    if (isUnknownCat)
+                    {
+                        if(UnknownCat.InstItem == null) 
+                            UnknownCat.InstItem = Types;
+                        else
+                            UnknownCat.InstItem = new ObservableCollection<Inst>(UnknownCat.InstItem.Union(Types));
+                        isUnknownCat = false;
+                    }
+                    else
+                    {
+                        currentCategory.InstItem = Types;
+                        Insts.Add(currentCategory);
+                    }
                     Types = new ObservableCollection<Inst>();
-                    Insts.Add(currentCategory);
                 }
+                Insts.Add(UnknownCat);
                 MainWindow mainWindow = new MainWindow();
                 (mainWindow.DataContext as ViewModels.ViewModel).Insts=Insts;
                 mainWindow.ShowDialog();
+
+                foreach (var cat in Insts)
+                    foreach (var type in cat.InstItem)
+                        foreach (var inst in type.InstItem)
+                            foreach (var par in inst.Parameters)
+                            {
+                                if (par.OldValue == null || par.Value == null) continue;
+                                if (!par.OldValue.Equals(par.Value))
+                                    if (!SetParameter1(inst.Element, par))
+                                    { 
+                                        //throw new Exception(); 
+                                    }
+                            }
+
+                //SetParameter1();
                 //string walls = "";
                 trans.Commit();
             }
@@ -110,11 +137,32 @@ namespace InpadPlugins.RevitElementsHierarchy
                 else
                     value = element.get_Parameter(p.Definition).AsValueString();
 
-                res.Add(new Models.Parameter { Name = p.Definition.Name, Value = value });
+                res.Add(new Models.Parameter { Name = p.Definition.Name, RevParameter = p, Value = value , OldValue = value});
             }
             ObservableCollection<Models.Parameter> result = new ObservableCollection<Models.Parameter>(res.OrderBy(x => x.Name));
 
             return result;
+        }
+
+        bool SetParameter1(Element element, Models.Parameter parameter)
+        {
+            try
+            {
+                switch (parameter.RevParameter.StorageType)
+                {
+                    case StorageType.String:
+                        return element.get_Parameter(parameter.RevParameter.Definition).Set(parameter.Value);
+                    case StorageType.Double:
+                        return element.get_Parameter(parameter.RevParameter.Definition).Set(Convert.ToDouble(parameter.Value));
+                    case StorageType.Integer:
+                        return element.get_Parameter(parameter.RevParameter.Definition).Set(Convert.ToInt32(parameter.Value));
+                    default: return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }
