@@ -148,16 +148,20 @@ namespace InpadPlugins.RevitElementsHierarchy
         {
             try
             {
-                switch (parameter.RevParameter.StorageType)
-                {
-                    case StorageType.String:
-                        return element.get_Parameter(parameter.RevParameter.Definition).Set(parameter.Value);
-                    case StorageType.Double:
-                        return element.get_Parameter(parameter.RevParameter.Definition).Set(Convert.ToDouble(parameter.Value));
-                    case StorageType.Integer:
-                        return element.get_Parameter(parameter.RevParameter.Definition).Set(Convert.ToInt32(parameter.Value));
-                    default: return false;
-                }
+                if (parameter.RevParameter.IsReadOnly)
+                    return false;
+                
+                    switch (parameter.RevParameter.StorageType)
+                    {
+                        case StorageType.String:
+                            return element.get_Parameter(parameter.RevParameter.Definition).Set(parameter.Value);
+                        case StorageType.Double:
+                            return element.get_Parameter(parameter.RevParameter.Definition).Set(Convert.ToDouble(parameter.Value));
+                        case StorageType.Integer:
+                            return element.get_Parameter(parameter.RevParameter.Definition).Set(Convert.ToInt32(parameter.Value));
+                        default: return false;
+                    }
+                
             }
             catch (Exception ex)
             {
